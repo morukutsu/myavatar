@@ -17,7 +17,7 @@ public class IntroScreen implements Screen {
 	// Useful standard variables
 	private Game game;
 	private SpriteBatch batch;
-	public OrthographicCamera camera;
+	private OrthographicCamera camera;
 	
 	// Resources
 	private BitmapFont font;
@@ -25,6 +25,9 @@ public class IntroScreen implements Screen {
 	private Sprite sprite;
 	
 	private Button btn_client, btn_server;
+	
+	// Others
+	private float time;
 	
 	public IntroScreen(Game g) {
 		game = g;
@@ -43,12 +46,24 @@ public class IntroScreen implements Screen {
 		sprite.setOrigin(0,  0);
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		
-		btn_client = new com.me.myavatar.gui.Button(font, "Tele-operate a robot", -200, -100);
-		btn_server = new com.me.myavatar.gui.Button(font, "Robot side program", 200, -100);
+		btn_client = new com.me.myavatar.gui.Button(font, camera, "Tele-operate a robot", -200, -100);
+		btn_server = new com.me.myavatar.gui.Button(font, camera, "Robot side program", 200, -100);
 	}
 	
 	@Override
 	public void render(float delta) {
+		// Update positions for elements
+		btn_client.setPosition(penner.easing.Back.easeInOut(time < 1.5f ? time : 1.5f, -1000, 800, 1.5f), -100);
+		btn_server.setPosition(penner.easing.Back.easeInOut(time < 1.5f ? time : 1.5f, 1000, -800, 1.5f), -100);
+		
+		// Check input
+		if(btn_client.isTouched()) {
+			
+		} else if(btn_server.isTouched()) {
+			
+		}
+		
+		// Display
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
@@ -62,7 +77,7 @@ public class IntroScreen implements Screen {
 		// Background color
 		sprite.setSize(w, h);
 		sprite.setOrigin(0,  0);
-		sprite.setColor(24.0f/255.0f, 1.0f/255.0f, 84.0f/255.0f, 1.0f);
+		sprite.setColor(37.0f/255.0f, 9.0f/255.0f, 49.0f/255.0f, 1.0f);
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		sprite.draw(batch);
 		
@@ -76,42 +91,39 @@ public class IntroScreen implements Screen {
 		btn_server.Draw(batch, delta);
 		
 		batch.end();
+		
+		// Time increment
+		time += delta;
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-		
+	
 	}
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-		
+		time = 0.0f;
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-		
+		time = 0.0f;
 	}
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-		
+	
 	}
 
 }
