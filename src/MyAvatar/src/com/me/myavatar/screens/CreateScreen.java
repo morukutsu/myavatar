@@ -10,10 +10,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.me.myavatar.core.App;
-import com.me.myavatar.gui.Button;
+import com.me.myavatar.avatar.Avatar;
 
-public class MenuScreen implements Screen {
+public class CreateScreen implements Screen {
 	// Useful standard variables
 	private Game game;
 	private SpriteBatch batch;
@@ -24,10 +23,10 @@ public class MenuScreen implements Screen {
 	private Texture blank_texture;
 	private Sprite sprite;
 	
-	// Buttons
-	private Button avatars_buttons[] = new Button[3];
+	// Avatar
+	private Avatar avatar;
 	
-	public MenuScreen(Game g) {
+	public CreateScreen(Game g) {
 		game = g;
 		
 		batch = new SpriteBatch();
@@ -45,11 +44,9 @@ public class MenuScreen implements Screen {
 		sprite.setOrigin(0,  0);
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		
-		// Creating buttons
-		float start_button_y = h/2 - 200;
-		avatars_buttons[0] = new Button(font, camera, "User 1", -w/2.0f + 250, start_button_y);
-		avatars_buttons[1] = new Button(font, camera, "User 2", -w/2.0f + 250, start_button_y - 100);
-		avatars_buttons[2] = new Button(font, camera, "User 3", -w/2.0f + 250, start_button_y - 200);
+		// Avatar
+		avatar = new Avatar();
+		avatar.x = 200;
 	}
 	
 	@Override
@@ -72,52 +69,51 @@ public class MenuScreen implements Screen {
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		sprite.draw(batch);
 		
-		// Text Avatars
+		// Text Create
 		font.setScale(1);
 		font.setColor(1, 1, 1, 1);
-		font.draw(batch, "Avatar", -w/2.0f + 40, h/2.0f - 40);
+		font.draw(batch, "Create", -w/2.0f + 40, h/2.0f - 40);
 		
-		// Boutons avatars
-		for(int i = 0; i < 3; i++) {
-			avatars_buttons[i].Draw(batch, delta);
-			
-			if(avatars_buttons[i].isTouched())
-			{
-				App g = (App) game;
-				game.setScreen(g.createScreen);
-			}
-		}
+		// Affichage avatar
+		avatar.Draw(batch);
 		
 		batch.end();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void show() {
-	
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void hide() {
-	
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void pause() {
-	
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void resume() {
-
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void dispose() {
-	
+		// TODO Auto-generated method stub
+		
 	}
+
 }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.me.myavatar.core.App;
 import com.me.myavatar.gui.Button;
 
 public class IntroScreen implements Screen {
@@ -58,7 +59,8 @@ public class IntroScreen implements Screen {
 		
 		// Check input
 		if(btn_client.isTouched()) {
-			
+			App g = (App) game;
+			game.setScreen(g.menuScreen);
 		} else if(btn_server.isTouched()) {
 			
 		}
