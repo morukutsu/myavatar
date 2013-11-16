@@ -27,6 +27,9 @@ public class MenuScreen implements Screen {
 	// Buttons
 	private Button avatars_buttons[] = new Button[3];
 	
+	// Others
+	private float time;
+		
 	public MenuScreen(Game g) {
 		game = g;
 		
@@ -47,19 +50,26 @@ public class MenuScreen implements Screen {
 		
 		// Creating buttons
 		float start_button_y = h/2 - 200;
-		avatars_buttons[0] = new Button(font, camera, "User 1", -w/2.0f + 250, start_button_y);
-		avatars_buttons[1] = new Button(font, camera, "User 2", -w/2.0f + 250, start_button_y - 100);
-		avatars_buttons[2] = new Button(font, camera, "User 3", -w/2.0f + 250, start_button_y - 200);
+		avatars_buttons[0] = new Button(font, camera, "User 1", -w/2.0f + 250 -400, start_button_y);
+		avatars_buttons[1] = new Button(font, camera, "User 2", -w/2.0f + 250 -400, start_button_y - 100);
+		avatars_buttons[2] = new Button(font, camera, "User 3", -w/2.0f + 250 -400, start_button_y - 200);
 	}
 	
 	@Override
 	public void render(float delta) {
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
+		// Easing
+		float start_button_y = h/2 - 200;
+		avatars_buttons[0].setPosition(penner.easing.Back.easeInOut(time < 1.0f ? time : 1.0f, -w/2.0f + 250 -400, 400, 1.0f), start_button_y);
+		avatars_buttons[1].setPosition(penner.easing.Back.easeInOut(time < 0.9f ? time + 0.1f : 1.0f, -w/2.0f + 250 -400, 400, 1.0f), start_button_y -100);
+		avatars_buttons[2].setPosition(penner.easing.Back.easeInOut(time < 0.8f ? time + 0.2f: 1.0f, -w/2.0f + 250 -400, 400, 1.0f), start_button_y -200);
+		
+		
 		// Display
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
 		
 		// Start drawing
 		batch.setProjectionMatrix(camera.combined);
@@ -89,6 +99,9 @@ public class MenuScreen implements Screen {
 		}
 		
 		batch.end();
+		
+		// Time increment
+		time += delta;
 	}
 
 	@Override
@@ -98,7 +111,7 @@ public class MenuScreen implements Screen {
 
 	@Override
 	public void show() {
-	
+		time = 0.0f;
 	}
 
 	@Override

@@ -37,7 +37,11 @@ public class EyeBrow extends FaceElement {
 	
 	public void Draw(SpriteBatch batch)
 	{
-		spr.setScale(scale);
+		if(flipX)
+			spr.setScale(-scale, scale);
+		else
+			spr.setScale(scale);
+		
 		spr.setPosition(x + offsetX - img.getWidth()/2, y + offsetY - img.getHeight()/2);
 		spr.setOrigin(img.getWidth()/2,  img.getHeight()/2);
 		spr.draw(batch);

@@ -11,7 +11,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.googlecode.javacv.FrameGrabber.Exception;
 import com.me.myavatar.core.App;
+import com.me.myavatar.core.RunWebcamCapture;
+import com.me.myavatar.core.Webcam;
 import com.me.myavatar.gui.Button;
 
 public class IntroScreen implements Screen {
@@ -29,6 +32,8 @@ public class IntroScreen implements Screen {
 	
 	// Others
 	private float time;
+	private Webcam cam;
+	private Sprite webcamSpr;
 	
 	public IntroScreen(Game g) {
 		game = g;
@@ -49,6 +54,20 @@ public class IntroScreen implements Screen {
 		
 		btn_client = new com.me.myavatar.gui.Button(font, camera, "Tele-operate a robot", -200, -100);
 		btn_server = new com.me.myavatar.gui.Button(font, camera, "Robot side program", 200, -100);
+		
+		try {
+			cam = new Webcam();
+			
+			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
+			webcamSpr = new Sprite(region1);
+			webcamSpr.setSize(640, 480);
+			webcamSpr.setOrigin(0,  0);
+			webcamSpr.setPosition(-webcamSpr.getWidth()/2, -webcamSpr.getHeight()/2);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -64,6 +83,9 @@ public class IntroScreen implements Screen {
 		} else if(btn_server.isTouched()) {
 			
 		}
+		
+		// Update webcam frame
+		cam.updateFrame();
 		
 		// Display
 		Gdx.gl.glClearColor(1, 1, 1, 1);
@@ -92,6 +114,7 @@ public class IntroScreen implements Screen {
 		btn_client.Draw(batch, delta);
 		btn_server.Draw(batch, delta);
 		
+		webcamSpr.draw(batch);
 		batch.end();
 		
 		// Time increment
@@ -106,11 +129,27 @@ public class IntroScreen implements Screen {
 	@Override
 	public void show() {
 		time = 0.0f;
+		
+		try {
+			cam.Start();
+			Thread t = new Thread(new RunWebcamCapture(cam));
+			t.start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void hide() {
 		time = 0.0f;
+		
+		try {
+			cam.Stop();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override

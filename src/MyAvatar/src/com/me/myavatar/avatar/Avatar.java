@@ -40,6 +40,7 @@ public class Avatar {
 		eyebrows[0] = new EyeBrow(1, x, y);
 		eyebrows[0].offsetY = 110;
 		eyebrows[0].offsetX = 125;
+		eyebrows[0].flipX = true;
 		
 		eyebrows[1] = new EyeBrow(1, x, y);
 		eyebrows[1].offsetY = 110;

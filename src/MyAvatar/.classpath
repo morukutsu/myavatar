@@ -4,5 +4,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="libs/gdx.jar" sourcepath="libs/gdx-sources.jar"/>
 	<classpathentry kind="lib" path="libs/easing.jar"/>
+	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-cppjars/ffmpeg-20130915-git-7ac6c63-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-cppjars/opencv-2.4.6.0-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-bin/javacpp.jar"/>
+	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-bin/javacv.jar"/>
+	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-bin/javacv-windows-x86_64.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
