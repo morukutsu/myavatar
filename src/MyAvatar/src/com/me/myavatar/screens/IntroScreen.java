@@ -33,6 +33,7 @@ public class IntroScreen implements Screen {
 	// Others
 	private float time;
 	private Webcam cam;
+	private Thread webcamCapThread;
 	private Sprite webcamSpr;
 	
 	public IntroScreen(Game g) {
@@ -132,8 +133,8 @@ public class IntroScreen implements Screen {
 		
 		try {
 			cam.Start();
-			Thread t = new Thread(new RunWebcamCapture(cam));
-			t.start();
+			webcamCapThread = new Thread(new RunWebcamCapture(cam));
+			webcamCapThread.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -145,6 +146,7 @@ public class IntroScreen implements Screen {
 		time = 0.0f;
 		
 		try {
+			webcamCapThread.stop();
 			cam.Stop();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
