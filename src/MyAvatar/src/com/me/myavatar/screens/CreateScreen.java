@@ -75,7 +75,7 @@ public class CreateScreen implements Screen {
 		font.draw(batch, "Create", -w/2.0f + 40, h/2.0f - 40);
 		
 		// Affichage avatar
-		avatar.Draw(batch);
+		avatar.Draw(batch, delta);
 		
 		batch.end();
 	}

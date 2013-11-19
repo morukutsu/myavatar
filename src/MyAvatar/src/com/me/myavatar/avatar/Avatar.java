@@ -1,6 +1,10 @@
 package com.me.myavatar.avatar;
 
+import static com.googlecode.javacv.cpp.opencv_core.cvGetSeqElem;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.googlecode.javacv.cpp.opencv_core.CvRect;
+import com.googlecode.javacv.cpp.opencv_core.CvSeq;
 
 public class Avatar {
 	public float x;
@@ -14,9 +18,18 @@ public class Avatar {
 	
 	private java.util.ArrayList<FaceElement> faceElems = new java.util.ArrayList<FaceElement>();
 	
+	// Eye contact
+	private float eyeCX, eyeCY;
+	private float curEyeCX, curEyeCY;
+	private final float EYESPEED = 1.0f;
+	private float faceTime;
+	
 	public Avatar()
 	{
 		x = y = 0;
+		eyeCX = eyeCY = 0;
+		curEyeCX = curEyeCY = 0;
+		faceTime = 0.0f;
 		
 		face = new Face(1, x, y);
 		
@@ -57,11 +70,81 @@ public class Avatar {
 		
 	}
 	
-	public void Draw(SpriteBatch batch) {
+	public void Draw(SpriteBatch batch, float delta) {
+		// Update eye pos
+		if(curEyeCX < eyeCX)
+			curEyeCX += EYESPEED;
+		if(curEyeCX > eyeCX)
+			curEyeCX -= EYESPEED;
+		if(curEyeCY < eyeCY)
+			curEyeCY += EYESPEED;
+		if(curEyeCY > eyeCY)
+			curEyeCY -= EYESPEED;
+		
+		faceTime += delta;
+		if(faceTime > 3.0f)
+		{
+			eyeCX = eyeCY = 0;
+		}
+		
+		eyes[0].eyeBall.offsetY = curEyeCX;
+		eyes[0].eyeBall.offsetX = curEyeCY;
+		
+		eyes[1].eyeBall.offsetY = curEyeCX;
+		eyes[1].eyeBall.offsetX = curEyeCY;
+		
 		for(FaceElement e : faceElems) {
 			e.x = x;
 			e.y = y;
 			e.Draw(batch);
+		}	
+	}
+	
+	public void ProcessFaces(CvSeq faces) {
+		// We track only one face
+		CvRect r = null;
+		
+		// Check if there is a face
+		if (faces != null) {
+            int total = faces.total();
+            for (int i = 0; i < total; i++) {
+                r = new CvRect(cvGetSeqElem(faces, i));
+                break;
+            }
+        }
+		
+		if(r == null) {
+			return;
 		}
+		
+		faceTime = 0.0f;
+		
+		// Get face center
+		float faceCenterX, faceCenterY;
+		faceCenterX = r.x()*2 + (r.width()*2)/2;
+		faceCenterY = r.y()*2 + (r.height()*2)/2;
+		
+		// Adjust position relative to center
+		faceCenterX -= 640/2;
+		faceCenterY -= 480/2;
+		
+		// Compute vector length (for distance)
+		float length = (float)Math.sqrt((double)faceCenterX*faceCenterX + (double)faceCenterY*faceCenterY);
+		
+		// Compute vector angle relative to (0, 0)
+		float angle = (float)Math.atan2(-(double)faceCenterX, -(double)faceCenterY);
+		
+		//System.out.println("L : " + length + " A : " + angle);
+		
+		// Move eyes
+		// TODO : take size of the head at screen in consideration
+		eyeCX = ((length / 200.0f) * 15.0f);
+		eyeCY = 0.0f;
+		
+		float xr = eyeCX*(float)Math.cos(angle) - eyeCY*(float)Math.sin(angle);
+		float yr = eyeCY*(float)Math.cos(angle) + eyeCX*(float)Math.sin(angle);
+		
+		eyeCX = xr;
+		eyeCY = yr;
 	}
 }

@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.googlecode.javacv.FrameGrabber.Exception;
+import com.me.myavatar.avatar.Avatar;
 import com.me.myavatar.core.RunWebcamCapture;
 import com.me.myavatar.core.Webcam;
 
@@ -36,6 +37,9 @@ public class RobotScreen implements Screen {
 	private Thread webcamCapThread;
 	private Sprite webcamSpr;
 	
+	// Avatar
+	private Avatar avatar;
+	
 	public RobotScreen(Game g) {
 		game = g;
 		batch = new SpriteBatch();
@@ -53,10 +57,15 @@ public class RobotScreen implements Screen {
 		sprite.setOrigin(0,  0);
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		
+		// Avatar
+		avatar = new Avatar();
+		avatar.x = 0;
+				
 		// Webcam initialization
 		try {
 			try {
 				cam = new Webcam();
+				cam.isFaceDetection = true;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -64,9 +73,9 @@ public class RobotScreen implements Screen {
 			
 			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
 			webcamSpr = new Sprite(region1);
-			webcamSpr.setSize(640, 480);
+			webcamSpr.setSize(320, 240);
 			webcamSpr.setOrigin(0,  0);
-			webcamSpr.setPosition(-webcamSpr.getWidth()/2, -webcamSpr.getHeight()/2);
+			webcamSpr.setPosition(-webcamSpr.getWidth() + w/2, -h/2);	
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -77,6 +86,9 @@ public class RobotScreen implements Screen {
 	public void render(float delta) {
 		// Update webcam frame
 		cam.updateFrame();
+		
+		// Process detected faces from webcam
+		avatar.ProcessFaces(cam.faces);
 		
 		// Display
 		Gdx.gl.glClearColor(1, 1, 1, 1);
@@ -101,6 +113,9 @@ public class RobotScreen implements Screen {
 		font.setColor(1, 1, 1, 1);
 		font.draw(batch, "Robot", -w/2.0f + 40, h/2.0f - 40);
 		
+		// Affichage avatar
+		avatar.Draw(batch, delta);
+				
 		// Draw webcam preview
 		webcamSpr.draw(batch);
 		

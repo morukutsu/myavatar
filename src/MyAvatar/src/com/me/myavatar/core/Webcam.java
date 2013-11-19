@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,11 +29,16 @@ public class Webcam {
 	public Texture tex;
 	public LinkedList<Pixmap> pixmaps = new LinkedList<Pixmap>();
 	
+	// Cam
+	private int[] rgbArray;
+	
 	// Face detection
 	public boolean isFaceDetection = false;
 	private CvHaarClassifierCascade classifier = null;
-	private CvSeq faces = null;
+	public CvSeq faces = null;
 	private CvMemStorage storage = null;
+	private IplImage grayImage;
+	private IplImage smallImage;
 	
 	// Other
 	public int loops = 0;
@@ -41,9 +48,10 @@ public class Webcam {
 	
 	public Webcam() throws Exception, IOException {
 		tex = new Texture(640, 480, Format.RGBA8888);
+		rgbArray = new int[640 * 480];
 		
 		// Load the classifier file from Java resources.
-		String classiferName = "haarcascade_frontalface_alt.xml";
+		String classiferName = "src/resources/haarcascade_frontalface_alt.xml";
         File classifierFile = new File(classiferName);
         if (classifierFile == null || classifierFile.length() <= 0) {
         	System.out.println(classifierFile.getAbsolutePath());
@@ -53,24 +61,23 @@ public class Webcam {
         // Preload the opencv_objdetect module to work around a known bug.
         Loader.load(opencv_objdetect.class);
         classifier = new CvHaarClassifierCascade(cvLoad(classifierFile.getAbsolutePath()));
-        classifierFile.delete();
         if (classifier.isNull()) {
             throw new IOException("Could not load the classifier file.");
         }
 
         storage = CvMemStorage.create();
+        
+        // Alloc space for FD images
+        grayImage = IplImage.create(640, 480, IPL_DEPTH_8U, 1);
+    	smallImage = IplImage.create(640/2, 480/2, IPL_DEPTH_8U, 1);
 	}
 	
 	public void Update() throws Exception {
 		IplImage grabbedImage = grabber.grab();
 		loops++;
 		if(grabbedImage != null) {
-			//cvSaveImage("capture-" + loops + ".jpg", grabbedImage);
-			
 			// Get image from webcam and convert to a drawable format
         	BufferedImage buf = grabbedImage.getBufferedImage();
-        	
-        	int[] rgbArray = new int[grabbedImage.width() * grabbedImage.height()];
         	
         	buf.getRGB(0, 0, grabbedImage.width(), grabbedImage.height(), rgbArray, 0, 640); 
         	
@@ -83,24 +90,41 @@ public class Webcam {
         			int b = ((p >> 16) & 0xFF);
         			int a = ((p >> 24) & 0xFF);
         			
-        			
             		rgbArray[i * 480 + j] = (b << 24) | (g << 16) | (r << 8) | a;
             	}
         	}
         	
         	pixmap.getPixels().asIntBuffer().put(rgbArray);
         	
-        	pixmaps.add(pixmap);
-        	
+
         	// Perform face detection
         	if(isFaceDetection) {
+        		// FD
+        		cvClearMemStorage(storage);
+        		
         		// Convert image to black and white downsampled
-        		IplImage grayImage  = IplImage.create(grabbedImage.width(),   grabbedImage.height(),   IPL_DEPTH_8U, 1);
-        		IplImage smallImage = IplImage.create(grabbedImage.width()/4, grabbedImage.height()/4, IPL_DEPTH_8U, 1);
-        		
-        		
+                cvCvtColor(grabbedImage, grayImage, CV_BGR2GRAY);
+                cvResize(grayImage, smallImage, CV_INTER_AREA);
+                faces = cvHaarDetectObjects(smallImage, classifier, storage, 1.1, 3, CV_HAAR_DO_CANNY_PRUNING);
                 
+                // Draw faces on pixmap (DEBUG)
+                if (faces != null) {
+                    pixmap.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+                    int total = faces.total();
+                    for (int i = 0; i < total; i++) {
+                        CvRect r = new CvRect(cvGetSeqElem(faces, i));
+                        pixmap.drawRectangle(r.x()*2, r.y()*2, r.width()*2, r.height()*2);
+                    }
+                }
+                
+                // Debug draw
+                pixmap.setColor(0.0f, 0.0f, 1.0f, 0.5f);
+                pixmap.drawLine(0, 240, 640, 240);
+                pixmap.drawLine(320, 0, 320, 480);
         	}
+        	
+        	// keep pixmap in frames buffer
+        	pixmaps.add(pixmap);
         }
 		
 		//System.out.println("BPP : " + grabber.getBitsPerPixel() + ", FMT : " + grabber.getPixelFormat());
@@ -118,9 +142,7 @@ public class Webcam {
 		grabber = new VideoInputFrameGrabber(0); 
 		//grabber.setFormat("dshow");
 		//grabber.setImageMode(ImageMode.COLOR);
-		grabber.start();
-		
-		
+		grabber.start();	
 	}
 	
 	public void Stop() throws Exception {
