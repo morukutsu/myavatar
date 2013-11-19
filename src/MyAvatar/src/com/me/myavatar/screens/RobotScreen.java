@@ -1,5 +1,7 @@
 package com.me.myavatar.screens;
 
+import java.io.IOException;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -7,17 +9,18 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.googlecode.javacv.FrameGrabber.Exception;
-import com.me.myavatar.core.App;
 import com.me.myavatar.core.RunWebcamCapture;
 import com.me.myavatar.core.Webcam;
-import com.me.myavatar.gui.Button;
 
-public class IntroScreen implements Screen {
+/**
+ * RobotScreen displays the current avatar and performs face detection, speech recognition
+ * and send the webcam feed to the client
+ */
+public class RobotScreen implements Screen {
 	// Useful standard variables
 	private Game game;
 	private SpriteBatch batch;
@@ -28,12 +31,12 @@ public class IntroScreen implements Screen {
 	private Texture blank_texture;
 	private Sprite sprite;
 	
-	private Button btn_client, btn_server;
+	// Webcam
+	private Webcam cam;
+	private Thread webcamCapThread;
+	private Sprite webcamSpr;
 	
-	// Others
-	private float time;
-	
-	public IntroScreen(Game g) {
+	public RobotScreen(Game g) {
 		game = g;
 		batch = new SpriteBatch();
 		float w = Gdx.graphics.getWidth();
@@ -50,26 +53,30 @@ public class IntroScreen implements Screen {
 		sprite.setOrigin(0,  0);
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		
-		btn_client = new com.me.myavatar.gui.Button(font, camera, "Tele-operate a robot", -200, -100);
-		btn_server = new com.me.myavatar.gui.Button(font, camera, "Robot side program", 200, -100);
-		
-		
+		// Webcam initialization
+		try {
+			try {
+				cam = new Webcam();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
+			webcamSpr = new Sprite(region1);
+			webcamSpr.setSize(640, 480);
+			webcamSpr.setOrigin(0,  0);
+			webcamSpr.setPosition(-webcamSpr.getWidth()/2, -webcamSpr.getHeight()/2);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
 	public void render(float delta) {
-		// Update positions for elements
-		btn_client.setPosition(penner.easing.Back.easeInOut(time < 1.5f ? time : 1.5f, -1000, 800, 1.5f), -100);
-		btn_server.setPosition(penner.easing.Back.easeInOut(time < 1.5f ? time : 1.5f, 1000, -800, 1.5f), -100);
-		
-		// Check input
-		if(btn_client.isTouched()) {
-			App g = (App) game;
-			game.setScreen(g.menuScreen);
-		} else if(btn_server.isTouched()) {
-			
-		}
-		
+		// Update webcam frame
+		cam.updateFrame();
 		
 		// Display
 		Gdx.gl.glClearColor(1, 1, 1, 1);
@@ -89,49 +96,55 @@ public class IntroScreen implements Screen {
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		sprite.draw(batch);
 		
-		// Splash text
-		font.setScale(1.0f);
-		TextBounds bounds = font.getBounds("My Avatar");
-		font.draw(batch, "My Avatar", -bounds.width/2.0f, bounds.height/2.0f);
+		// Text Robot
+		font.setScale(1);
+		font.setColor(1, 1, 1, 1);
+		font.draw(batch, "Robot", -w/2.0f + 40, h/2.0f - 40);
 		
-		// Buttons
-		btn_client.Draw(batch, delta);
-		btn_server.Draw(batch, delta);
+		// Draw webcam preview
+		webcamSpr.draw(batch);
 		
 		batch.end();
 		
-		// Time increment
-		time += delta;
 	}
-
 	@Override
 	public void resize(int width, int height) {
-	
+		// TODO Auto-generated method stub
+		
 	}
-
 	@Override
 	public void show() {
-		time = 0.0f;		
+		try {
+			cam.Start();
+			webcamCapThread = new Thread(new RunWebcamCapture(cam));
+			webcamCapThread.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-
 	@Override
 	public void hide() {
-		time = 0.0f;
+		try {
+			webcamCapThread.stop();
+			cam.Stop();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
 	}
-
 	@Override
 	public void pause() {
-
+		// TODO Auto-generated method stub
+		
 	}
-
 	@Override
 	public void resume() {
-
+		// TODO Auto-generated method stub
+		
 	}
-
 	@Override
 	public void dispose() {
-	
+		// TODO Auto-generated method stub
+		
 	}
-
+		
 }
