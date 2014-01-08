@@ -35,7 +35,7 @@ public class EyeBrow extends FaceElement {
 		
 	}
 	
-	public void Draw(SpriteBatch batch)
+	public void Draw(SpriteBatch batch, float delta)
 	{
 		if(flipX)
 			spr.setScale(-scale, scale);

@@ -32,7 +32,7 @@ public class Face extends FaceElement {
 		//spr.setOrigin(img.getWidth()/2,  img.getHeight()/2);
 	}
 	
-	public void Draw(SpriteBatch batch)
+	public void Draw(SpriteBatch batch, float delta)
 	{
 		spr.setScale(scale);
 		spr.setPosition(x + offsetX - img.getWidth()/2, y + offsetY - img.getHeight()/2);

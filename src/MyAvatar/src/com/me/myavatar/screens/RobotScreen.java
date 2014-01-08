@@ -129,13 +129,8 @@ public class RobotScreen implements Screen {
 	}
 	@Override
 	public void show() {
-		try {
-			cam.Start();
-			webcamCapThread = new Thread(new RunWebcamCapture(cam));
-			webcamCapThread.start();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		webcamCapThread = new Thread(new RunWebcamCapture(cam));
+		webcamCapThread.start();
 	}
 	@Override
 	public void hide() {

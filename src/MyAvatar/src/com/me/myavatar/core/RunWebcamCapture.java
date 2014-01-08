@@ -11,6 +11,13 @@ public class RunWebcamCapture implements Runnable {
 	
 	@Override
 	public void run() {
+		try {
+			webcam.Start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		while(true) {
 			try {
 				webcam.Update();

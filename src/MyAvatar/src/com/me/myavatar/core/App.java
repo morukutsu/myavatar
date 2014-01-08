@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.me.myavatar.screens.CreateScreen;
 import com.me.myavatar.screens.IntroScreen;
 import com.me.myavatar.screens.MenuScreen;
+import com.me.myavatar.screens.PlayScreen;
 import com.me.myavatar.screens.RobotScreen;
 
 public class App extends Game implements ApplicationListener {
@@ -17,6 +18,7 @@ public class App extends Game implements ApplicationListener {
 	public MenuScreen 	menuScreen;
 	public CreateScreen createScreen;
 	public RobotScreen  robotScreen;
+	public PlayScreen   playScreen;
 	
 	@Override
 	public void create() {
@@ -26,9 +28,9 @@ public class App extends Game implements ApplicationListener {
 		introScreen = new IntroScreen(this);
 		menuScreen  = new MenuScreen(this);
 		createScreen = new CreateScreen(this);
-		robotScreen = new RobotScreen(this);
+		playScreen = new PlayScreen(this);
 		
-		setScreen(robotScreen);
+		setScreen(playScreen);
 	}
 
 }

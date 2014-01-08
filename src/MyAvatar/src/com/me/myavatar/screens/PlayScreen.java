@@ -1,5 +1,7 @@
 package com.me.myavatar.screens;
 
+import java.io.IOException;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -7,17 +9,18 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.googlecode.javacv.FrameGrabber.Exception;
+import com.me.myavatar.avatar.Avatar;
 import com.me.myavatar.core.App;
 import com.me.myavatar.core.RunWebcamCapture;
 import com.me.myavatar.core.Webcam;
 import com.me.myavatar.gui.Button;
+import com.me.myavatar.gui.ImageButton;
 
-public class IntroScreen implements Screen {
+public class PlayScreen implements Screen {
 	// Useful standard variables
 	private Game game;
 	private SpriteBatch batch;
@@ -27,14 +30,19 @@ public class IntroScreen implements Screen {
 	private BitmapFont font;
 	private Texture blank_texture;
 	private Sprite sprite;
+	private ImageButton btn_yes, btn_no, btn_hello;
 	
-	private Button btn_client, btn_server;
+	// Avatar
+	private Avatar avatar;
 	
-	// Others
-	private float time;
+	// Webcam
+	private Webcam cam;
+	private Thread webcamCapThread;
+	private Sprite webcamSpr;
 	
-	public IntroScreen(Game g) {
+	public PlayScreen(Game g) {
 		game = g;
+		
 		batch = new SpriteBatch();
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
@@ -50,28 +58,42 @@ public class IntroScreen implements Screen {
 		sprite.setOrigin(0,  0);
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		
-		btn_client = new com.me.myavatar.gui.Button(font, camera, "Tele-operate a robot", -200, -100);
-		btn_server = new com.me.myavatar.gui.Button(font, camera, "Robot side program", 200, -100);
+		// Avatar
+		avatar = new Avatar();
+		avatar.x = 100;
 		
+		// Buttons
+		btn_yes = new com.me.myavatar.gui.ImageButton("data/textures/yes.png", camera, -500, -100);
+		btn_no = new com.me.myavatar.gui.ImageButton("data/textures/no.png", camera, -390, -100);
+		btn_hello = new com.me.myavatar.gui.ImageButton("data/textures/hello.png", camera, -280, -100);
 		
+		// Webcam initialization
+		try {
+			try {
+				cam = new Webcam();
+				cam.isFaceDetection = true;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
+			webcamSpr = new Sprite(region1);
+			webcamSpr.setSize(320, 240);
+			webcamSpr.setOrigin(0,  0);
+			webcamSpr.setPosition(-webcamSpr.getWidth() + w/2, -h/2);	
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
 	public void render(float delta) {
-		// Update positions for elements
-		btn_client.setPosition(penner.easing.Back.easeInOut(time < 1.5f ? time : 1.5f, -1000, 800, 1.5f), -100);
-		btn_server.setPosition(penner.easing.Back.easeInOut(time < 1.5f ? time : 1.5f, 1000, -800, 1.5f), -100);
-		
-		// Check input
-		if(btn_client.isTouched()) {
-			App g = (App) game;
-			game.setScreen(g.menuScreen);
-		} else if(btn_server.isTouched()) {
-			App g = (App) game;
-			game.setScreen(g.robotScreen);
-		}
-		
-		
+		// Update webcam frame
+		cam.isFaceDetection = false;
+		cam.updateFrame();
+				
 		// Display
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
@@ -90,49 +112,69 @@ public class IntroScreen implements Screen {
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		sprite.draw(batch);
 		
-		// Splash text
-		font.setScale(1.0f);
-		TextBounds bounds = font.getBounds("My Avatar");
-		font.draw(batch, "My Avatar", -bounds.width/2.0f, bounds.height/2.0f);
+		// Text Create
+		font.setScale(1);
+		font.setColor(1, 1, 1, 1);
+		font.draw(batch, "Tele-operate", -w/2.0f + 80, h/2.0f - 80);
+		
+		// Draw webcam preview
+		webcamSpr.draw(batch);
+				
+		// Affichage avatar
+		avatar.Draw(batch, delta);
 		
 		// Buttons
-		btn_client.Draw(batch, delta);
-		btn_server.Draw(batch, delta);
+		btn_yes.Draw(batch, delta);
+		btn_no.Draw(batch, delta);
+		btn_hello.Draw(batch, delta);
+		
+		// Boutons actions
+		if(btn_yes.isTouched())
+		{
+			// TODO : envoyer la commande vers le serveur
+		}
 		
 		batch.end();
-		
-		// Time increment
-		time += delta;
 	}
 
 	@Override
 	public void resize(int width, int height) {
-	
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void show() {
-		time = 0.0f;		
+		webcamCapThread = new Thread(new RunWebcamCapture(cam));
+		webcamCapThread.start();
 	}
 
 	@Override
 	public void hide() {
-		time = 0.0f;
+		try {
+			webcamCapThread.stop();
+			cam.Stop();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
 	}
 
 	@Override
 	public void pause() {
-
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void resume() {
-
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void dispose() {
-	
+		// TODO Auto-generated method stub
+		
 	}
 
 }

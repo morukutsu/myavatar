@@ -24,6 +24,9 @@ public class Avatar {
 	private final float EYESPEED = 1.0f;
 	private float faceTime;
 	
+	// Eye blink
+	public float blinkTime = 0.0f;
+		
 	public Avatar()
 	{
 		x = y = 0;
@@ -82,7 +85,7 @@ public class Avatar {
 			curEyeCY -= EYESPEED;
 		
 		faceTime += delta;
-		if(faceTime > 3.0f)
+		if(faceTime > 5.0f)
 		{
 			eyeCX = eyeCY = 0;
 		}
@@ -93,10 +96,22 @@ public class Avatar {
 		eyes[1].eyeBall.offsetY = curEyeCX;
 		eyes[1].eyeBall.offsetX = curEyeCY;
 		
+		// Eye blink
+		blinkTime -= delta;
+		if(blinkTime <= 0) {
+			// Launch blink anim
+			blinkTime = (float)Math.random()*8 + 0.25f;
+			
+			// Set eye blink states to eyes
+			eyes[0].StartBlink();
+			eyes[1].StartBlink();
+		}
+		
+		
 		for(FaceElement e : faceElems) {
 			e.x = x;
 			e.y = y;
-			e.Draw(batch);
+			e.Draw(batch, delta);
 		}	
 	}
 	
@@ -137,8 +152,11 @@ public class Avatar {
 		//System.out.println("L : " + length + " A : " + angle);
 		
 		// Move eyes
+		float headSize = (r.width() + r.height())/2.0f;
+		//System.out.println(headSize);
+		
 		// TODO : take size of the head at screen in consideration
-		eyeCX = ((length / 200.0f) * 15.0f);
+		eyeCX = ((length / 200.0f) * 10.0f);
 		eyeCY = 0.0f;
 		
 		float xr = eyeCX*(float)Math.cos(angle) - eyeCY*(float)Math.sin(angle);

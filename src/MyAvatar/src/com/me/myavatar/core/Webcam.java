@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.googlecode.javacpp.Loader;
+import com.googlecode.javacv.FFmpegFrameGrabber;
 import com.googlecode.javacv.FrameGrabber;
 import com.googlecode.javacv.FrameGrabber.Exception;
 import com.googlecode.javacv.FrameGrabber.ImageMode;
@@ -51,7 +52,7 @@ public class Webcam {
 		rgbArray = new int[640 * 480];
 		
 		// Load the classifier file from Java resources.
-		String classiferName = "src/resources/haarcascade_frontalface_alt.xml";
+		String classiferName = "src/resources/haarcascade_frontalface_alt2.xml";
         File classifierFile = new File(classiferName);
         if (classifierFile == null || classifierFile.length() <= 0) {
         	System.out.println(classifierFile.getAbsolutePath());
@@ -76,6 +77,13 @@ public class Webcam {
 		IplImage grabbedImage = grabber.grab();
 		loops++;
 		if(grabbedImage != null) {
+			// Resize image if needed
+			if(grabbedImage.width() != 640 || grabbedImage.height() != 480) {
+				IplImage workImage = IplImage.create(640, 480, IPL_DEPTH_8U, 3);
+				cvResize(grabbedImage, workImage, CV_INTER_AREA);
+				grabbedImage = workImage;
+			}
+	
 			// Get image from webcam and convert to a drawable format
         	BufferedImage buf = grabbedImage.getBufferedImage();
         	
@@ -139,9 +147,13 @@ public class Webcam {
 	}
 	
 	public void Start() throws Exception {
-		grabber = new VideoInputFrameGrabber(0); 
+		//grabber = new VideoInputFrameGrabber(0); 
 		//grabber.setFormat("dshow");
 		//grabber.setImageMode(ImageMode.COLOR);
+		
+		grabber = new FFmpegFrameGrabber("http://localhost:8080");
+		grabber.setFormat("mjpeg");
+		
 		grabber.start();	
 	}
 	

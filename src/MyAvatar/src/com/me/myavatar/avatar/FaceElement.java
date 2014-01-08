@@ -7,5 +7,5 @@ public abstract class FaceElement {
 	public float x, y, offsetX, offsetY, scale;
 	public boolean flipX = false;
 	
-	public abstract void Draw(SpriteBatch b);
+	public abstract void Draw(SpriteBatch b, float delta);
 }

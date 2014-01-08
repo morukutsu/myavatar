@@ -10,6 +10,8 @@ public class EyeBall extends FaceElement {
 	public Texture img;
 	public Sprite spr;
 	
+	public float scaleY = 1.0f;
+	
 	public EyeBall(int _faceID, float _x,  float _y) {
 		x = _x;
 		y = _y;
@@ -32,9 +34,9 @@ public class EyeBall extends FaceElement {
 		//spr.setOrigin(img.getWidth()/2,  img.getHeight()/2);
 	}
 	
-	public void Draw(SpriteBatch batch)
+	public void Draw(SpriteBatch batch, float delta)
 	{
-		spr.setScale(scale);
+		spr.setScale(scale, scaleY);
 		spr.setPosition(x + offsetX - img.getWidth()/2, y + offsetY - img.getHeight()/2);
 		spr.setOrigin(img.getWidth()/2,  img.getHeight()/2);
 		spr.draw(batch);

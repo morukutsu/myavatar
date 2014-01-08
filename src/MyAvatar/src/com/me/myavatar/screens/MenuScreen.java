@@ -94,7 +94,7 @@ public class MenuScreen implements Screen {
 			if(avatars_buttons[i].isTouched())
 			{
 				App g = (App) game;
-				game.setScreen(g.createScreen);
+				game.setScreen(g.playScreen);
 			}
 		}
 		
