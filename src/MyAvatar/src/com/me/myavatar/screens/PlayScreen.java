@@ -66,26 +66,6 @@ public class PlayScreen implements Screen {
 		btn_yes = new com.me.myavatar.gui.ImageButton("data/textures/yes.png", camera, -500, -100);
 		btn_no = new com.me.myavatar.gui.ImageButton("data/textures/no.png", camera, -390, -100);
 		btn_hello = new com.me.myavatar.gui.ImageButton("data/textures/hello.png", camera, -280, -100);
-		
-		// Webcam initialization
-		try {
-			try {
-				cam = new Webcam();
-				cam.isFaceDetection = true;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
-			webcamSpr = new Sprite(region1);
-			webcamSpr.setSize(320, 240);
-			webcamSpr.setOrigin(0,  0);
-			webcamSpr.setPosition(-webcamSpr.getWidth() + w/2, -h/2);	
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Override
@@ -145,6 +125,29 @@ public class PlayScreen implements Screen {
 
 	@Override
 	public void show() {
+		// Webcam initialization
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
+		try {
+			try {
+				cam = new Webcam();
+				cam.isFaceDetection = false;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
+			webcamSpr = new Sprite(region1);
+			webcamSpr.setSize(320, 240);
+			webcamSpr.setOrigin(0,  0);
+			webcamSpr.setPosition(-webcamSpr.getWidth() + w/2, -h/2);	
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+				
 		webcamCapThread = new Thread(new RunWebcamCapture(cam));
 		webcamCapThread.start();
 	}

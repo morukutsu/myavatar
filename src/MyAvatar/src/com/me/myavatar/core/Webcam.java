@@ -74,66 +74,73 @@ public class Webcam {
 	}
 	
 	public void Update() throws Exception {
-		IplImage grabbedImage = grabber.grab();
-		loops++;
-		if(grabbedImage != null) {
-			// Resize image if needed
-			if(grabbedImage.width() != 640 || grabbedImage.height() != 480) {
-				IplImage workImage = IplImage.create(640, 480, IPL_DEPTH_8U, 3);
-				cvResize(grabbedImage, workImage, CV_INTER_AREA);
-				grabbedImage = workImage;
-			}
+		try
+		{
+			IplImage grabbedImage = grabber.grab();
+			loops++;
+			if(grabbedImage != null) {
+				// Resize image if needed
+				if(grabbedImage.width() != 640 || grabbedImage.height() != 480) {
+					IplImage workImage = IplImage.create(640, 480, IPL_DEPTH_8U, 3);
+					cvResize(grabbedImage, workImage, CV_INTER_AREA);
+					grabbedImage = workImage;
+				}
+		
+				// Get image from webcam and convert to a drawable format
+	        	BufferedImage buf = grabbedImage.getBufferedImage();
+	        	
+	        	buf.getRGB(0, 0, grabbedImage.width(), grabbedImage.height(), rgbArray, 0, 640); 
+	        	
+	        	Pixmap pixmap = new Pixmap(grabbedImage.width(), grabbedImage.height(), Format.RGBA8888);
+	        	for(int i = 0; i < 640; i++) {
+	        		for(int j = 0; j < 480; j++) {
+	        			int p = rgbArray[i * 480 + j];
+	        			int r = (p & 0xFF);
+	        			int g = ((p >> 8) & 0xFF);
+	        			int b = ((p >> 16) & 0xFF);
+	        			int a = ((p >> 24) & 0xFF);
+	        			
+	            		rgbArray[i * 480 + j] = (b << 24) | (g << 16) | (r << 8) | a;
+	            	}
+	        	}
+	        	
+	        	pixmap.getPixels().asIntBuffer().put(rgbArray);
+	        	
 	
-			// Get image from webcam and convert to a drawable format
-        	BufferedImage buf = grabbedImage.getBufferedImage();
-        	
-        	buf.getRGB(0, 0, grabbedImage.width(), grabbedImage.height(), rgbArray, 0, 640); 
-        	
-        	Pixmap pixmap = new Pixmap(grabbedImage.width(), grabbedImage.height(), Format.RGBA8888);
-        	for(int i = 0; i < 640; i++) {
-        		for(int j = 0; j < 480; j++) {
-        			int p = rgbArray[i * 480 + j];
-        			int r = (p & 0xFF);
-        			int g = ((p >> 8) & 0xFF);
-        			int b = ((p >> 16) & 0xFF);
-        			int a = ((p >> 24) & 0xFF);
-        			
-            		rgbArray[i * 480 + j] = (b << 24) | (g << 16) | (r << 8) | a;
-            	}
-        	}
-        	
-        	pixmap.getPixels().asIntBuffer().put(rgbArray);
-        	
-
-        	// Perform face detection
-        	if(isFaceDetection) {
-        		// FD
-        		cvClearMemStorage(storage);
-        		
-        		// Convert image to black and white downsampled
-                cvCvtColor(grabbedImage, grayImage, CV_BGR2GRAY);
-                cvResize(grayImage, smallImage, CV_INTER_AREA);
-                faces = cvHaarDetectObjects(smallImage, classifier, storage, 1.1, 3, CV_HAAR_DO_CANNY_PRUNING);
-                
-                // Draw faces on pixmap (DEBUG)
-                if (faces != null) {
-                    pixmap.setColor(1.0f, 0.0f, 0.0f, 1.0f);
-                    int total = faces.total();
-                    for (int i = 0; i < total; i++) {
-                        CvRect r = new CvRect(cvGetSeqElem(faces, i));
-                        pixmap.drawRectangle(r.x()*2, r.y()*2, r.width()*2, r.height()*2);
-                    }
-                }
-                
-                // Debug draw
-                pixmap.setColor(0.0f, 0.0f, 1.0f, 0.5f);
-                pixmap.drawLine(0, 240, 640, 240);
-                pixmap.drawLine(320, 0, 320, 480);
-        	}
-        	
-        	// keep pixmap in frames buffer
-        	pixmaps.add(pixmap);
-        }
+	        	// Perform face detection
+	        	if(isFaceDetection) {
+	        		// FD
+	        		cvClearMemStorage(storage);
+	        		
+	        		// Convert image to black and white downsampled
+	                cvCvtColor(grabbedImage, grayImage, CV_BGR2GRAY);
+	                cvResize(grayImage, smallImage, CV_INTER_AREA);
+	                faces = cvHaarDetectObjects(smallImage, classifier, storage, 1.1, 3, CV_HAAR_DO_CANNY_PRUNING);
+	                
+	                // Draw faces on pixmap (DEBUG)
+	                if (faces != null) {
+	                    pixmap.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+	                    int total = faces.total();
+	                    for (int i = 0; i < total; i++) {
+	                        CvRect r = new CvRect(cvGetSeqElem(faces, i));
+	                        pixmap.drawRectangle(r.x()*2, r.y()*2, r.width()*2, r.height()*2);
+	                    }
+	                }
+	                
+	                // Debug draw
+	                pixmap.setColor(0.0f, 0.0f, 1.0f, 0.5f);
+	                pixmap.drawLine(0, 240, 640, 240);
+	                pixmap.drawLine(320, 0, 320, 480);
+	        	}
+	        	
+	        	// keep pixmap in frames buffer
+	        	pixmaps.add(pixmap);
+	        }
+		}
+		catch(Exception e)
+		{
+			
+		}
 		
 		//System.out.println("BPP : " + grabber.getBitsPerPixel() + ", FMT : " + grabber.getPixelFormat());
 	}

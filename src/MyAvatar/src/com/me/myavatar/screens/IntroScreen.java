@@ -51,9 +51,7 @@ public class IntroScreen implements Screen {
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		
 		btn_client = new com.me.myavatar.gui.Button(font, camera, "Tele-operate a robot", -200, -100);
-		btn_server = new com.me.myavatar.gui.Button(font, camera, "Robot side program", 200, -100);
-		
-		
+		btn_server = new com.me.myavatar.gui.Button(font, camera, "Robot side program", 200, -100);	
 	}
 	
 	@Override

@@ -29,8 +29,9 @@ public class App extends Game implements ApplicationListener {
 		menuScreen  = new MenuScreen(this);
 		createScreen = new CreateScreen(this);
 		playScreen = new PlayScreen(this);
+		robotScreen = new RobotScreen(this);
 		
-		setScreen(playScreen);
+		setScreen(introScreen);
 	}
 
 }

@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.googlecode.javacv.FrameGrabber.Exception;
 import com.me.myavatar.avatar.Avatar;
 import com.me.myavatar.core.RunWebcamCapture;
+import com.me.myavatar.core.Server;
 import com.me.myavatar.core.Webcam;
 
 /**
@@ -40,6 +41,12 @@ public class RobotScreen implements Screen {
 	// Avatar
 	private Avatar avatar;
 	
+	// Server
+	private Server server;
+	
+	// Others
+	private boolean firstFrame = true;
+	
 	public RobotScreen(Game g) {
 		game = g;
 		batch = new SpriteBatch();
@@ -60,26 +67,6 @@ public class RobotScreen implements Screen {
 		// Avatar
 		avatar = new Avatar();
 		avatar.x = 0;
-				
-		// Webcam initialization
-		try {
-			try {
-				cam = new Webcam();
-				cam.isFaceDetection = true;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
-			webcamSpr = new Sprite(region1);
-			webcamSpr.setSize(320, 240);
-			webcamSpr.setOrigin(0,  0);
-			webcamSpr.setPosition(-webcamSpr.getWidth() + w/2, -h/2);	
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Override
@@ -114,13 +101,28 @@ public class RobotScreen implements Screen {
 		font.draw(batch, "Robot", -w/2.0f + 40, h/2.0f - 40);
 		
 		// Affichage avatar
-		avatar.Draw(batch, delta);
+		if(server.isClientConnected)
+		{
+			avatar.Draw(batch, delta);
 				
-		// Draw webcam preview
-		webcamSpr.draw(batch);
+			// Draw webcam preview
+			webcamSpr.draw(batch);
+		}
+		else
+		{
+			if(firstFrame)
+			{
+				font.draw(batch, "Waiting for client...", -300, 0);
+			}
+			else
+			{
+				server.acceptClient();
+			}
+		}
 		
 		batch.end();
 		
+		firstFrame = false;
 	}
 	@Override
 	public void resize(int width, int height) {
@@ -129,6 +131,32 @@ public class RobotScreen implements Screen {
 	}
 	@Override
 	public void show() {
+		// Webcam initialization
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
+		try {
+			try {
+				cam = new Webcam();
+				cam.isFaceDetection = true;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
+			webcamSpr = new Sprite(region1);
+			webcamSpr.setSize(320, 240);
+			webcamSpr.setOrigin(0,  0);
+			webcamSpr.setPosition(-webcamSpr.getWidth() + w/2, -h/2);	
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		// Server initialization
+		server = new Server();
+				
 		webcamCapThread = new Thread(new RunWebcamCapture(cam));
 		webcamCapThread.start();
 	}
