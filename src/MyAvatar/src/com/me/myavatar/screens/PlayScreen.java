@@ -1,10 +1,18 @@
 package com.me.myavatar.screens;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -19,6 +27,8 @@ import com.me.myavatar.core.RunWebcamCapture;
 import com.me.myavatar.core.Webcam;
 import com.me.myavatar.gui.Button;
 import com.me.myavatar.gui.ImageButton;
+
+import java.util.Properties;
 
 public class PlayScreen implements Screen {
 	// Useful standard variables
@@ -39,6 +49,9 @@ public class PlayScreen implements Screen {
 	private Webcam cam;
 	private Thread webcamCapThread;
 	private Sprite webcamSpr;
+	
+	// Net
+	private Socket socket;
 	
 	public PlayScreen(Game g) {
 		game = g;
@@ -66,6 +79,8 @@ public class PlayScreen implements Screen {
 		btn_yes = new com.me.myavatar.gui.ImageButton("data/textures/yes.png", camera, -500, -100);
 		btn_no = new com.me.myavatar.gui.ImageButton("data/textures/no.png", camera, -390, -100);
 		btn_hello = new com.me.myavatar.gui.ImageButton("data/textures/hello.png", camera, -280, -100);
+		
+		
 	}
 	
 	@Override
@@ -150,6 +165,44 @@ public class PlayScreen implements Screen {
 				
 		webcamCapThread = new Thread(new RunWebcamCapture(cam));
 		webcamCapThread.start();
+		
+		// Get server IP from file
+        String fileName = "src/resources/settings.txt";
+        FileHandle settingsFile = Gdx.files.internal(fileName);
+        
+        InputStream is;
+		try {
+			is = new FileInputStream(settingsFile.file() );
+			
+			// load the properties file
+	        Properties prop = new Properties();
+	        try {
+				prop.load(is);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	        
+	        // get the value for app.name key
+	        try {
+	        	InetAddress addr = InetAddress.getByName(prop.getProperty("app.commandserver"));
+				socket = new Socket(addr, 8000);
+				
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				out.print("TIME");
+				
+				
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}       
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} 
+        
+		// Client connection
 	}
 
 	@Override
