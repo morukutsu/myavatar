@@ -127,6 +127,16 @@ public class PlayScreen implements Screen {
 		if(btn_yes.isTouched())
 		{
 			// TODO : envoyer la commande vers le serveur
+			PrintWriter out;
+			try {
+				out = new PrintWriter(socket.getOutputStream(), true);
+				System.out.println("Sending YES command");
+				out.println("YES");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		
 		batch.end();
@@ -167,40 +177,29 @@ public class PlayScreen implements Screen {
 		webcamCapThread.start();
 		
 		// Get server IP from file
-        String fileName = "src/resources/settings.txt";
-        FileHandle settingsFile = Gdx.files.internal(fileName);
-        
         InputStream is;
-		try {
-			is = new FileInputStream(settingsFile.file() );
-			
-			// load the properties file
-	        Properties prop = new Properties();
-	        try {
-				prop.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	        
-	        // get the value for app.name key
-	        try {
-	        	InetAddress addr = InetAddress.getByName(prop.getProperty("app.commandserver"));
-				socket = new Socket(addr, 8000);
-				
-				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-				out.print("TIME");
-				
-				
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}       
-		} catch (FileNotFoundException e) {
+
+		is = this.getClass().getResourceAsStream("settings.txt");
+		
+		// load the properties file
+        Properties prop = new Properties();
+        try {
+			prop.load(is);
+		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
+        
+        // get the value for app.name key
+        try {
+        	InetAddress addr = InetAddress.getByName(prop.getProperty("app.commandserver"));
+			socket = new Socket(addr, 8000);		
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}       
         
 		// Client connection
 	}

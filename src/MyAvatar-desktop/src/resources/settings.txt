@@ -1,2 +1,0 @@
-app.webcamserver=http://localhost:8080
-app.commandserver=127.0.0.1

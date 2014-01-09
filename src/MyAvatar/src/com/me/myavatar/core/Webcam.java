@@ -3,6 +3,7 @@ package com.me.myavatar.core;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 
 import com.badlogic.gdx.Gdx;
@@ -52,7 +53,8 @@ public class Webcam {
 		rgbArray = new int[640 * 480];
 		
 		// Load the classifier file from Java resources.
-		String classiferName = "src/resources/haarcascade_frontalface_alt2.xml";
+		String classiferName = "haarcascade_frontalface_alt2.xml";
+		
         File classifierFile = new File(classiferName);
         if (classifierFile == null || classifierFile.length() <= 0) {
         	System.out.println(classifierFile.getAbsolutePath());

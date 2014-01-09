@@ -45,6 +45,7 @@ public class Server
                 Thread t = new Thread(w);
                 t.start();
                 
+                System.out.println("Client connected!");
                 isClientConnected = true;
                 break;
             }
@@ -66,26 +67,24 @@ class ClientWorker implements Runnable
     }
     public void run()
     {
-        String request = null;
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(incoming.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            request = in.readLine();
-            System.out.println("request =" + request);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(incoming.getOutputStream(),true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        out.println("The command is not readable");
-
+    	System.out.println("Client worker thread running");
+    	
+    	while(true)
+    	{
+	        String request = null;
+	        BufferedReader in = null;
+	        try {
+	            in = new BufferedReader(new InputStreamReader(incoming.getInputStream()));
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	        try {
+	        	System.out.println("Waiting for command...");
+	            request = in.readLine();
+	            System.out.println("Received: " + request);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+    	}
     }
 }
