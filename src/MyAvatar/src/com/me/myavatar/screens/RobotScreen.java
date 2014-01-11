@@ -47,6 +47,11 @@ public class RobotScreen implements Screen {
 	// Others
 	private boolean firstFrame = true;
 	
+	// Background color animations
+	private float background_time = 0.0f;
+	private float bg_r, bg_g, bg_b;
+	private boolean background_anim = false;
+	
 	public RobotScreen(Game g) {
 		game = g;
 		batch = new SpriteBatch();
@@ -74,6 +79,9 @@ public class RobotScreen implements Screen {
 		// Update webcam frame
 		cam.updateFrame();
 		
+		// Get commands received from client
+		ProcessCommands();
+		
 		// Process detected faces from webcam
 		avatar.ProcessFaces(cam.faces);
 		
@@ -94,6 +102,8 @@ public class RobotScreen implements Screen {
 		sprite.setColor(37.0f/255.0f, 9.0f/255.0f, 49.0f/255.0f, 1.0f);
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		sprite.draw(batch);
+		
+		DisplayBackgroundColorAnim(delta);
 		
 		// Text Robot
 		font.setScale(1);
@@ -124,6 +134,33 @@ public class RobotScreen implements Screen {
 		
 		firstFrame = false;
 	}
+	
+	public void ProcessCommands()
+	{
+		// Get a command sended from server
+		String command = server.commands.poll();
+		if(command != null) 
+		{
+			if(command.contains("YES") ) 
+			{
+				StartBackgroundColorAnim("YES");
+				System.out.println("## Processed YES command");
+				avatar.StartAnimation(0);
+			} 
+			else if(command.contains("NO")) 
+			{
+				StartBackgroundColorAnim("NO");
+				System.out.println("## Processed NO command");
+				avatar.StartAnimation(1);
+			}
+			else if(command.contains("HELLO")) 
+			{
+				StartBackgroundColorAnim("HELLO");
+				System.out.println("## Processed HELLO command");
+			}
+		}
+	}
+	
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
@@ -184,5 +221,53 @@ public class RobotScreen implements Screen {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	// Background color
+	public void StartBackgroundColorAnim(String command) {
+		background_time = 0.0f;
+		background_anim = true;
 		
+		if(command.equals("YES"))
+		{
+			bg_r = 0f;
+			bg_g = 0.75f;
+			bg_b = 0f;
+		}
+		else if(command.equals("NO"))
+		{
+			bg_r = 0.75f;
+			bg_g = 0f;
+			bg_b = 0f;
+		}
+		else if(command.equals("HELLO"))
+		{
+			bg_r = 0f;
+			bg_g = 0f;
+			bg_b = 0.75f;
+		}
+	}
+	
+	public void DisplayBackgroundColorAnim(float dt) {
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
+		background_time += dt;
+		
+		if(background_anim)
+		{
+			// Compute alpha
+			float alpha_bg = (float)Math.abs(Math.sin(background_time));
+			
+			// Display
+			sprite.setSize(w, h);
+			sprite.setOrigin(0,  0);
+			sprite.setColor(bg_r, bg_g, bg_b, alpha_bg);
+			sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
+			sprite.draw(batch);
+		}
+		
+		if(background_time >= 3) {
+			background_anim = false;
+		}
+	}
 }

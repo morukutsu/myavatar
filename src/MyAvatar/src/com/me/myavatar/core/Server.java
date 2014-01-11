@@ -5,6 +5,9 @@ import java.net.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedList;
+
+import com.badlogic.gdx.graphics.Pixmap;
 
 public class Server
 {  
@@ -13,6 +16,9 @@ public class Server
     private String hostname = "";
     private String hostIP ="";
     private ServerSocket serverSocket=null;
+    
+    // Commands received
+    public LinkedList<String> commands = new LinkedList<String>();
     
     // Status
     public boolean isClientConnected = false;
@@ -41,7 +47,7 @@ public class Server
             ClientWorker w;
             try
             {   
-                w = new ClientWorker(serverSocket.accept());
+                w = new ClientWorker(serverSocket.accept(), this);
                 Thread t = new Thread(w);
                 t.start();
                 
@@ -61,9 +67,12 @@ public class Server
 class ClientWorker implements Runnable
 {
     Socket incoming;
-    public ClientWorker(Socket incoming)
+    Server server;
+    
+    public ClientWorker(Socket incoming, Server serv)
     {
         this.incoming = incoming;
+        server = serv;
     }
     public void run()
     {
@@ -81,6 +90,8 @@ class ClientWorker implements Runnable
 	        try {
 	        	System.out.println("Waiting for command...");
 	            request = in.readLine();
+	            server.commands.add(request);
+	            
 	            System.out.println("Received: " + request);
 	        } catch (IOException e) {
 	            e.printStackTrace();

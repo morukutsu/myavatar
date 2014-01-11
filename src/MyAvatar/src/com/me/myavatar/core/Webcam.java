@@ -49,7 +49,7 @@ public class Webcam {
 	private FrameGrabber grabber = null;
 	
 	public Webcam() throws Exception, IOException {
-		tex = new Texture(640, 480, Format.RGBA8888);
+		tex = new Texture(1024, 512, Format.RGBA8888);
 		rgbArray = new int[640 * 480];
 		
 		// Load the classifier file from Java resources.
@@ -159,6 +159,7 @@ public class Webcam {
 		//grabber = new VideoInputFrameGrabber(0); 
 		//grabber.setFormat("dshow");
 		//grabber.setImageMode(ImageMode.COLOR);
+		
 		
 		grabber = new FFmpegFrameGrabber("http://localhost:8080");
 		grabber.setFormat("mjpeg");

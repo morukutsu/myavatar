@@ -40,7 +40,7 @@ public class PlayScreen implements Screen {
 	private BitmapFont font;
 	private Texture blank_texture;
 	private Sprite sprite;
-	private ImageButton btn_yes, btn_no, btn_hello;
+	private ImageButton btn_yes, btn_no, btn_hello, btn_up, btn_down, btn_left, btn_right, btn_tright, btn_tleft;
 	
 	// Avatar
 	private Avatar avatar;
@@ -52,6 +52,11 @@ public class PlayScreen implements Screen {
 	
 	// Net
 	private Socket socket;
+	
+	// Background color animations
+	private float background_time = 0.0f;
+	private float bg_r, bg_g, bg_b;
+	private boolean background_anim = false;
 	
 	public PlayScreen(Game g) {
 		game = g;
@@ -76,10 +81,11 @@ public class PlayScreen implements Screen {
 		avatar.x = 100;
 		
 		// Buttons
-		btn_yes = new com.me.myavatar.gui.ImageButton("data/textures/yes.png", camera, -500, -100);
-		btn_no = new com.me.myavatar.gui.ImageButton("data/textures/no.png", camera, -390, -100);
-		btn_hello = new com.me.myavatar.gui.ImageButton("data/textures/hello.png", camera, -280, -100);
+		btn_yes = new com.me.myavatar.gui.ImageButton("data/textures/yes.png", camera, -500 + 50, -100);
+		btn_no = new com.me.myavatar.gui.ImageButton("data/textures/no.png", camera, -390 + 50, -100);
+		btn_hello = new com.me.myavatar.gui.ImageButton("data/textures/hello.png", camera, -280 + 50, -100);
 		
+		btn_up = new com.me.myavatar.gui.ImageButton("data/textures/up.png", camera, -390, -210);
 		
 	}
 	
@@ -107,8 +113,10 @@ public class PlayScreen implements Screen {
 		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 		sprite.draw(batch);
 		
+		DisplayBackgroundColorAnim(delta);
+		
 		// Text Create
-		font.setScale(1);
+		font.setScale(0.5f);
 		font.setColor(1, 1, 1, 1);
 		font.draw(batch, "Tele-operate", -w/2.0f + 80, h/2.0f - 80);
 		
@@ -122,26 +130,46 @@ public class PlayScreen implements Screen {
 		btn_yes.Draw(batch, delta);
 		btn_no.Draw(batch, delta);
 		btn_hello.Draw(batch, delta);
+		//btn_up.Draw(batch, delta);
 		
 		// Boutons actions
-		if(btn_yes.isTouched())
+		btn_yes.Update();
+		btn_no.Update();
+		btn_hello.Update();
+		//btn_up.Update();
+		
+		if(btn_yes.isClicked())
 		{
-			// TODO : envoyer la commande vers le serveur
-			PrintWriter out;
-			try {
-				out = new PrintWriter(socket.getOutputStream(), true);
-				System.out.println("Sending YES command");
-				out.println("YES");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+			SendCommand("YES");
+			StartBackgroundColorAnim("YES");
+			avatar.StartAnimation(0);
+		}
+		else if(btn_no.isClicked())
+		{
+			SendCommand("NO");
+			StartBackgroundColorAnim("NO");
+			avatar.StartAnimation(1);
+		}
+		else if(btn_hello.isClicked())
+		{
+			SendCommand("HELLO");
+			StartBackgroundColorAnim("HELLO");
 		}
 		
 		batch.end();
 	}
-
+	
+	public void SendCommand(String command) {
+		PrintWriter out;
+		try {
+			out = new PrintWriter(socket.getOutputStream(), true);
+			System.out.println("Sending " + command + " command");
+			out.println(command);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
@@ -231,5 +259,53 @@ public class PlayScreen implements Screen {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	// Background color
+	public void StartBackgroundColorAnim(String command) {
+		background_time = 0.0f;
+		background_anim = true;
+		
+		if(command.equals("YES"))
+		{
+			bg_r = 0f;
+			bg_g = 0.75f;
+			bg_b = 0f;
+		}
+		else if(command.equals("NO"))
+		{
+			bg_r = 0.75f;
+			bg_g = 0f;
+			bg_b = 0f;
+		}
+		else if(command.equals("HELLO"))
+		{
+			bg_r = 0f;
+			bg_g = 0f;
+			bg_b = 0.75f;
+		}
+	}
+	
+	public void DisplayBackgroundColorAnim(float dt) {
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
+		background_time += dt;
+		
+		if(background_anim)
+		{
+			// Compute alpha
+			float alpha_bg = (float)Math.abs(Math.sin(background_time));
+			
+			// Display
+			sprite.setSize(w, h);
+			sprite.setOrigin(0,  0);
+			sprite.setColor(bg_r, bg_g, bg_b, alpha_bg);
+			sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
+			sprite.draw(batch);
+		}
+		
+		if(background_time >= 3) {
+			background_anim = false;
+		}
+	}
 }

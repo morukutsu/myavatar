@@ -9,8 +9,8 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "my avatar - Master in Artificial Intelligence";
 		cfg.useGL20 = false;
-		cfg.width = 1280;
-		cfg.height = 720;
+		cfg.width = 1024;
+		cfg.height = 600;
 		
 		new LwjglApplication(new App(), cfg);
 	}

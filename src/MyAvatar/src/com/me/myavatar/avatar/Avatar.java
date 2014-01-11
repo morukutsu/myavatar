@@ -26,13 +26,70 @@ public class Avatar {
 	
 	// Eye blink
 	public float blinkTime = 0.0f;
+	
+	// YES / NO
+	public float mov_x, mov_y;
+	
+	public float animationTime;
+	public boolean animationActivated;
+	public int animationType;
+	
+	public void StartAnimation(int type)
+	{
+		animationType = type;
+		animationActivated = true;
+		animationTime = 0.0f;
+		mov_x = 0;
+		mov_y = 0;
 		
+		if(type == 1)
+		{
+			mouth.ReloadTex(2);
+		}
+	}
+	
+	public void UpdateAnimation(float dt)
+	{
+		if(animationActivated)
+		{
+			animationTime += dt;
+			
+			if(animationType == 0)
+			{
+				mov_x = 0.0f;
+				mov_y = (float)Math.sin(animationTime*4) * 50.0f;
+			}
+			else if(animationType == 1)
+			{
+				mov_x = (float)Math.sin(animationTime*4) * 50.0f;
+				mov_y = 0.0f;
+			}
+			
+			if(animationTime >= Math.PI) {
+				mov_x = 0.0f;
+				mov_y = 0.0f;
+				
+				animationActivated = false;
+				animationTime = 0.0f;
+				
+				if(animationType == 1)
+				{
+					mouth.ReloadTex(1);
+				}
+			}
+		}
+	}
+	
 	public Avatar()
 	{
 		x = y = 0;
 		eyeCX = eyeCY = 0;
 		curEyeCX = curEyeCY = 0;
 		faceTime = 0.0f;
+		
+		mov_x = mov_y = 0;
+		animationTime = 0.0f;
+		animationActivated = false;
 		
 		face = new Face(1, x, y);
 		
@@ -74,6 +131,8 @@ public class Avatar {
 	}
 	
 	public void Draw(SpriteBatch batch, float delta) {
+		UpdateAnimation(delta);
+		
 		// Update eye pos
 		if(curEyeCX < eyeCX)
 			curEyeCX += EYESPEED;
@@ -109,9 +168,18 @@ public class Avatar {
 		
 		
 		for(FaceElement e : faceElems) {
-			e.x = x;
-			e.y = y;
+			float sx = x;
+			float sy = y;
+			
+			if(!((e instanceof Face) || (e instanceof Hair)) && animationActivated)
+			{
+				e.x = x + mov_x;
+				e.y = y + mov_y;
+			}
+			
 			e.Draw(batch, delta);
+			e.x = sx;
+			e.y = sy;
 		}	
 	}
 	

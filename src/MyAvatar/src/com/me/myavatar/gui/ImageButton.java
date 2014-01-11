@@ -22,6 +22,9 @@ public class ImageButton {
 	
 	private float time;
 	
+	public boolean touched = false;
+	private boolean pressed = false;
+	
 	public ImageButton(String imgfile, OrthographicCamera cam, float _x, float _y) {
 		x = _x;
 		y = _y;
@@ -29,7 +32,7 @@ public class ImageButton {
 		
 		blank_texture = new Texture(Gdx.files.internal(imgfile));
 		
-		TextureRegion region = new TextureRegion(blank_texture, 0, 0, 100, 100);
+		TextureRegion region = new TextureRegion(blank_texture, 0, 0, 128, 128);
 		sprite = new Sprite(region);
 		
 		
@@ -79,8 +82,22 @@ public class ImageButton {
 		return false;
 	}
 	
+	public boolean isClicked() {
+		boolean save = touched;
+		return save;
+	}
+	
 	public void setPosition(float _x, float _y) {
 		x = _x;
 		y = _y;
+	}
+	
+	public void Update() {
+		touched = false;
+		boolean old_pressed = pressed;
+		pressed = isTouched();
+		
+		if(pressed != old_pressed && old_pressed == true)
+			touched = true;
 	}
 }
