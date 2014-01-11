@@ -23,7 +23,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.googlecode.javacv.FrameGrabber.Exception;
 import com.me.myavatar.avatar.Avatar;
 import com.me.myavatar.core.App;
+import com.me.myavatar.core.RunVoiceCapture;
 import com.me.myavatar.core.RunWebcamCapture;
+import com.me.myavatar.core.Voice;
 import com.me.myavatar.core.Webcam;
 import com.me.myavatar.gui.Button;
 import com.me.myavatar.gui.ImageButton;
@@ -57,6 +59,9 @@ public class PlayScreen implements Screen {
 	private float background_time = 0.0f;
 	private float bg_r, bg_g, bg_b;
 	private boolean background_anim = false;
+	
+	private Voice voice;
+	private Thread voiceCapThread;
 	
 	public PlayScreen(Game g) {
 		game = g;
@@ -156,6 +161,17 @@ public class PlayScreen implements Screen {
 			StartBackgroundColorAnim("HELLO");
 		}
 		
+		// Poll voice commands
+		String voiceCom = voice.commands.poll();
+		if(voiceCom != null) {
+			if(voiceCom.contains("YES"))
+				avatar.StartAnimation(0);
+			else if(voiceCom.contains("NO"))
+				avatar.StartAnimation(0);
+			SendCommand(voiceCom);
+			StartBackgroundColorAnim(voiceCom);
+		}
+		
 		batch.end();
 	}
 	
@@ -229,7 +245,10 @@ public class PlayScreen implements Screen {
 			e.printStackTrace();
 		}       
         
-		// Client connection
+		// Start voice
+        voice = new Voice();
+        voiceCapThread = new Thread(new RunVoiceCapture(voice));
+        voiceCapThread.start();
 	}
 
 	@Override

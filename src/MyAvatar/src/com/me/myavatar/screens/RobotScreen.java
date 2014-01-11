@@ -183,7 +183,7 @@ public class RobotScreen implements Screen {
 			
 			TextureRegion region1 = new TextureRegion(cam.tex, 0, 0, 640, 480);
 			webcamSpr = new Sprite(region1);
-			webcamSpr.setSize(320, 240);
+			webcamSpr.setSize(320*0.75f, 240*0.75f);
 			webcamSpr.setOrigin(0,  0);
 			webcamSpr.setPosition(-webcamSpr.getWidth() + w/2, -h/2);	
 			

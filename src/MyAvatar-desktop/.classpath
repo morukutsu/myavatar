@@ -8,11 +8,19 @@
 	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-natives.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-natives.jar"/>
 	<classpathentry kind="lib" path="libs/easing.jar"/>
-	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-bin/javacpp.jar"/>
-	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-bin/javacv.jar"/>
-	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-bin/javacv-windows-x86.jar"/>
-	<classpathentry kind="lib" path="D:/Donnees/Mes documents/Cours/Cognitive Interaction with Robots/MyAvatar/src/MyAvatar-desktop/libs/javacv-cppjars/opencv-2.4.6.0-windows-x86.jar"/>
 	<classpathentry kind="lib" path="libs/javacv-cppjars/ffmpeg-20130915-git-7ac6c63-windows-x86.jar"/>
 	<classpathentry kind="lib" path="libs/javacv-cppjars/ffmpeg-20130915-git-7ac6c63-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="libs/javacv-bin/javacpp.jar"/>
+	<classpathentry kind="lib" path="libs/javacv-bin/javacv-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="libs/javacv-bin/javacv-windows-x86.jar"/>
+	<classpathentry kind="lib" path="libs/javacv-bin/javacv.jar"/>
+	<classpathentry kind="lib" path="libs/javacv-cppjars/opencv-2.4.6.0-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="libs/javacv-cppjars/opencv-2.4.6.0-windows-x86.jar"/>
+	<classpathentry kind="lib" path="libs/js.jar"/>
+	<classpathentry kind="lib" path="libs/jsapi.jar"/>
+	<classpathentry kind="lib" path="libs/sphinx4.jar"/>
+	<classpathentry kind="lib" path="libs/TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="libs/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="libs/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
