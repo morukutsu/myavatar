@@ -143,31 +143,34 @@ public class PlayScreen implements Screen {
 		btn_hello.Update();
 		//btn_up.Update();
 		
-		if(btn_yes.isClicked())
+		if(!background_anim)
 		{
-			SendCommand("YES");
-			StartBackgroundColorAnim("YES");
-			avatar.StartAnimation(0);
-		}
-		else if(btn_no.isClicked())
-		{
-			SendCommand("NO");
-			StartBackgroundColorAnim("NO");
-			avatar.StartAnimation(1);
-		}
-		else if(btn_hello.isClicked())
-		{
-			SendCommand("HELLO");
-			StartBackgroundColorAnim("HELLO");
+			if(btn_yes.isClicked())
+			{
+				SendCommand("YES");
+				StartBackgroundColorAnim("YES");
+				avatar.StartAnimation(0);
+			}
+			else if(btn_no.isClicked())
+			{
+				SendCommand("NO");
+				StartBackgroundColorAnim("NO");
+				avatar.StartAnimation(1);
+			}
+			else if(btn_hello.isClicked())
+			{
+				SendCommand("HELLO");
+				StartBackgroundColorAnim("HELLO");
+			}
 		}
 		
 		// Poll voice commands
 		String voiceCom = voice.commands.poll();
-		if(voiceCom != null) {
+		if(voiceCom != null && !background_anim) {
 			if(voiceCom.contains("YES"))
 				avatar.StartAnimation(0);
 			else if(voiceCom.contains("NO"))
-				avatar.StartAnimation(0);
+				avatar.StartAnimation(1);
 			SendCommand(voiceCom);
 			StartBackgroundColorAnim(voiceCom);
 		}

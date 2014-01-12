@@ -51,6 +51,7 @@ public class RobotScreen implements Screen {
 	private float background_time = 0.0f;
 	private float bg_r, bg_g, bg_b;
 	private boolean background_anim = false;
+	private String currentAnim = "";
 	
 	public RobotScreen(Game g) {
 		game = g;
@@ -226,6 +227,7 @@ public class RobotScreen implements Screen {
 	public void StartBackgroundColorAnim(String command) {
 		background_time = 0.0f;
 		background_anim = true;
+		currentAnim = command;
 		
 		if(command.equals("YES"))
 		{
@@ -264,7 +266,16 @@ public class RobotScreen implements Screen {
 			sprite.setColor(bg_r, bg_g, bg_b, alpha_bg);
 			sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
 			sprite.draw(batch);
+			
+			if(currentAnim.equals("HELLO")) {
+				// Text Robot
+				font.setScale(1);
+				font.setColor(1, 1, 1, 1);
+				font.draw(batch, "Hello !", - 500, 100);
+			}
 		}
+		
+		
 		
 		if(background_time >= 3) {
 			background_anim = false;
